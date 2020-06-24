@@ -29,7 +29,15 @@ class ProductsTestCase(TestCase):
 	def test_context(self):
 		response = self.client.get(self.url)
 		self.assertTrue('products' in response.context)
-		self.assertEquals(response.context['products'].count(), 10)
+		self.assertEquals(response.context['products'].count(), 3)
+
+	def test_paginator(self):
+		response = self.client.get(self.url)
+		self.assertEquals(response.context['paginator'].num_pages, 4)
+
+	def test_page_not_found(self):
+		response = self.client.get('{}?page=5'.format(self.url))
+		self.assertEquals(response.status_code, 404)
 
 
 
@@ -56,9 +64,18 @@ class CategoryTestCase(TestCase):
 
 	def test_context(self):
 		response = self.client.get(self.url)
-		self.assertTrue('curr_category' in response.context)
+		# self.assertTrue('curr_category' in response.context)
 		self.assertTrue('products_by_category' in response.context)
-		self.assertEquals(response.context['products_by_category'].count(), 5)
+		self.assertEquals(response.context['products_by_category'].count(), 3)
+
+	def test_paginator(self):
+		response = self.client.get(self.url)
+		self.assertEquals(response.context['paginator'].num_pages, 2)
+
+	def test_page_not_found(self):
+		response = self.client.get('{}?page=3'.format(self.url))
+		self.assertEquals(response.status_code, 404)
+
 
 
 class ProductTestCase(TestCase):
