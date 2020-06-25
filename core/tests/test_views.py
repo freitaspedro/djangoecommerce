@@ -1,6 +1,10 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.core import mail
+from django.conf import settings
+
+from model_mommy import mommy
+
 
 class IndexViewTestCase(TestCase):
 
@@ -50,3 +54,51 @@ class ContactViewTestCase(TestCase):
         self.assertTrue(response.context['success'])
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].subject, 'Contato Django E-commerce')
+
+
+class LoginViewTestCase(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.url = reverse('login')
+        self.user = mommy.prepare(settings.AUTH_USER_MODEL)
+        self.user.set_password('123')
+        self.user.save()
+
+    def tearDown(self):
+        self.user.delete()
+
+    def test_status_code(self):
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+
+    def test_template_used(self):
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'login.html')
+
+    def test_invalid_form(self):
+        data = {'username': self.user.username, 'password': '1234'}
+        response = self.client.post(self.url, data)
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'login.html')
+        error_msg = 'Por favor, entre com um usuário  e senha corretos. Note que ambos os campos diferenciam maiúsculas e minúsculas.'
+        self.assertFormError(response, 'form', None, error_msg)
+
+    def test_valid_form(self):
+        data = {'username': self.user.username, 'password': '123'}
+        response = self.client.post(self.url, data)
+        self.assertRedirects(response, reverse(settings.LOGIN_REDIRECT_URL))
+
+
+class LogoutViewTestCase(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.url = reverse('logout')
+
+    def tearDown(self):
+        pass
+
+    def test_status_code(self):
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 302)
