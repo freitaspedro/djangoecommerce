@@ -1,9 +1,13 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.core import mail
+from django.contrib.auth import get_user_model
 from django.conf import settings
 
 from model_mommy import mommy
+
+
+User = get_user_model()
 
 
 class IndexViewTestCase(TestCase):
@@ -62,7 +66,7 @@ class LoginViewTestCase(TestCase):
         self.client = Client()
         self.url = reverse('login')
         self.user = mommy.prepare(settings.AUTH_USER_MODEL)
-        self.user.set_password('123')
+        self.user.set_password('password123')
         self.user.save()
 
     def tearDown(self):
@@ -77,7 +81,7 @@ class LoginViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'login.html')
 
     def test_invalid_form(self):
-        data = {'username': self.user.username, 'password': '1234'}
+        data = {'username': self.user.username, 'password': 'password1234'}
         response = self.client.post(self.url, data)
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'login.html')
@@ -85,9 +89,10 @@ class LoginViewTestCase(TestCase):
         self.assertFormError(response, 'form', None, error_msg)
 
     def test_valid_form(self):
-        data = {'username': self.user.username, 'password': '123'}
+        data = {'username': self.user.username, 'password': 'password123'}
         response = self.client.post(self.url, data)
         self.assertRedirects(response, reverse(settings.LOGIN_REDIRECT_URL))
+        self.assertTrue(response.wsgi_request.user.is_authenticated)
 
 
 class LogoutViewTestCase(TestCase):
@@ -102,3 +107,34 @@ class LogoutViewTestCase(TestCase):
     def test_status_code(self):
         response = self.client.get(self.url)
         self.assertEquals(response.status_code, 302)
+
+
+class RegisterViewTestCase(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.url = reverse('register')
+
+    def tearDown(self):
+        pass
+
+    def test_status_code(self):
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+
+    def test_template_used(self):
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'register.html')
+
+    def test_invalid_form(self):
+        data = {'username': 'username12three4', 'password1': 'password1two34', 'password2': 'password123four'}
+        response = self.client.post(self.url, data)
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'register.html')
+        self.assertFormError(response, 'form', 'password2', 'Os dois campos de senha não correspondem.')
+
+    def test_valid_form(self):
+        data = {'username': 'username12three4', 'password1': 'password1two34', 'password2': 'password1two34'}
+        response = self.client.post(self.url, data)
+        self.assertRedirects(response, reverse('index'))
+        self.assertEquals(User.objects.count(), 1)
