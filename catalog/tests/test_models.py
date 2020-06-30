@@ -14,7 +14,7 @@ class CategoryTestCase(TestCase):
 	def test_get_absolute_url(self):
 		self.assertEquals(
 			self.category.get_absolute_url(),
-			reverse('category', kwargs={'slug': self.category.slug})
+			reverse('catalog:category', kwargs={'slug': self.category.slug})
 		)
 
 
@@ -28,5 +28,5 @@ class ProductTestCase(TestCase):
 	def test_get_absolut_url(self):
 		self.assertEquals(
 			self.product.get_absolute_url(),
-			reverse('product', kwargs={'c_slug': self.product.category.slug, 'p_slug': self.product.slug})
+			reverse('catalog:product', kwargs={'c_slug': self.product.category.slug, 'p_slug': self.product.slug})
 		)

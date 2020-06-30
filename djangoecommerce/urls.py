@@ -26,6 +26,6 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='index'), name='logout'),
     path('registro/', include('accounts.urls', namespace='accounts')),
     path('contato/', views.contact, name='contact'),
-    path('produtos/', include('catalog.urls')),
+    path('produtos/', include('catalog.urls', namespace='catalog')),
     path('admin/', admin.site.urls),
 ]
