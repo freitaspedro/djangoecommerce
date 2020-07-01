@@ -56,5 +56,9 @@ class UpdatePasswordView(LoginRequiredMixin, FormView):
 		kwargs['user'] = self.request.user
 		return kwargs
 
+	def form_valid(self, form):
+		form.save()
+		return super(UpdatePasswordView, self).form_valid(form)
+
 
 update_password = UpdatePasswordView.as_view()
