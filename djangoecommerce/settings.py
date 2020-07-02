@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'core',
     'catalog',
     'accounts',
+    'checkout',
 ]
 
 MIDDLEWARE = [
@@ -150,6 +151,17 @@ LOGOUT_URL = 'logout'
 AUTH_USER_MODEL = 'accounts.User'
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',
                             'accounts.backends.ModelBackend')
+
+# Messages
+from django.contrib.messages import constants
+MESSAGE_TAGS = {
+    constants.DEBUG: 'debug',
+    constants.INFO: 'info',
+    constants.SUCCESS: 'success',
+    constants.WARNING: 'warning',
+    constants.ERROR: 'danger',
+}
+
 
 try:
     from .local_settings import *
