@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic import RedirectView, TemplateView
+from django.views.generic import RedirectView, TemplateView, ListView, DetailView
 from django.forms import modelformset_factory
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -8,6 +8,31 @@ from django.urls import reverse
 from catalog.models import Product
 
 from .models import CartItem, Order
+
+
+
+class OrderListView(LoginRequiredMixin, ListView):
+
+    template_name = 'order_list.html'
+    paginate_by = 3
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+
+
+order_list = OrderListView.as_view()
+
+
+
+class OrderDetailView(LoginRequiredMixin, DetailView):
+
+    template_name = 'order_detail.html'
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+
+
+order_detail = OrderDetailView.as_view()
 
 
 
@@ -23,7 +48,9 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
         else:
             messages.info(request, 'Não há itens no carrinho de compras')
             return redirect('checkout:cartitem')
-        return super(CheckoutView, self).get(request, *args, **kwargs)
+        response = super(CheckoutView, self).get(request, *args, **kwargs)
+        response.context_data['order'] = order
+        return response
 
 
 checkout = CheckoutView.as_view()

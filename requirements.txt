@@ -8,3 +8,4 @@ psycopg2==2.7.3.1
 model-mommy==2.0.0
 whitenoise==5.1.0
 django-widget-tweaks==1.4.8
+pagseguro==0.3.4
