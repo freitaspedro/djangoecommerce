@@ -88,6 +88,7 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
         if session_key and CartItem.objects.filter(cart_key=session_key).exists():
             cart_items = CartItem.objects.filter(cart_key=session_key)
             order = Order.objects.add_order(user=request.user, cart_items=cart_items)
+            cart_items.delete()
         else:
             messages.info(request, 'Não há itens no carrinho de compras')
             return redirect('checkout:cartitem')
