@@ -1,3 +1,6 @@
+from pagseguro import PagSeguro
+
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import RedirectView, TemplateView, ListView, DetailView
 from django.forms import modelformset_factory
@@ -8,6 +11,22 @@ from django.urls import reverse
 from catalog.models import Product
 
 from .models import CartItem, Order
+
+
+
+class PagSeguroView(LoginRequiredMixin, RedirectView):
+
+    def get_redirect_url(self, *args, **kwargs):
+        order_pk = self.kwargs.get('pk')
+        order = get_object_or_404(Order.objects.filter(user=self.request.user), pk=order_pk)
+        pagseguro = order.pagseguro()
+        pagseguro.redirect_url = self.request.build_absolute_uri(reverse('checkout:order_detail', args=[order.pk]))
+        # pagseguro.notification_url = self.request.build_absolute_uri(reverse('checkout:pagseguro_notification'))
+        response = pagseguro.checkout()
+        return response.payment_url
+
+
+pagseguro = PagSeguroView.as_view()
 
 
 
@@ -107,3 +126,23 @@ class CartItemView(TemplateView):
 
 
 cartitem = CartItemView.as_view()
+
+
+
+@csrf_exempt
+def pagseguro_notification(request):
+    notification_code = request.POST.get('notificationCode', None)
+    if notification_code:
+        pagseguro = PagSeguro(email=settings.PAGSEGURO_EMAIL, token=settings.PAGSEGURO_TOKEN, config={'sandbox': settings.PAGSEGURO_SANDBOX})
+        notification_data = pagseguro.check_notification(notification_code)
+        status = notification_data.status
+        reference = notification_data.reference
+        try:
+            order = Order.objects.get(pk=reference)
+        except Order.DoesNotExist:
+            pass
+        else:
+            order.pagseguro_update_status(status)
+    return HttpResponse('OK')
+
+

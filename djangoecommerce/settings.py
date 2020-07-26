@@ -163,6 +163,9 @@ MESSAGE_TAGS = {
     constants.ERROR: 'danger',
 }
 
+PAGSEGURO_TOKEN = ''
+PAGSEGURO_EMAIL = 'admin@djangoecomerce.com'
+PAGSEGURO_SANDBOX = True
 
 try:
     from .local_settings import *
