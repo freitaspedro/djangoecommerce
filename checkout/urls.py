@@ -11,4 +11,5 @@ urlpatterns = [
     path('meus-pedidos/<int:pk>/', views.order_detail, name='order_detail'),
     path('finalizar/<int:pk>/pagseguro/', views.pagseguro, name='pagseguro'),
     path('notificacoes/pagseguro/', views.pagseguro_notification, name='pagseguro_notification'),
+    path('finalizando/<int:pk>/paypal/', views.paypal, name='paypal'),
 ]

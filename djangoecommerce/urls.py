@@ -29,4 +29,5 @@ urlpatterns = [
     path('produtos/', include('catalog.urls', namespace='catalog')),
     path('checkout/', include('checkout.urls', namespace='checkout')),
     path('admin/', admin.site.urls),
+    path('paypal/', include('paypal.standard.ipn.urls')),
 ]
