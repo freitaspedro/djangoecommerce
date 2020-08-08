@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
+    'easy_thumbnails',
     'paypal.standard.ipn',
     'core',
     'catalog',
@@ -175,6 +176,13 @@ PAGSEGURO_SANDBOX = True
 
 PAYPAL_EMAIL = 'admin@djangoecomerce.com'
 PAYPAL_TEST = True
+
+# Thumbnails
+THUMBNAIL_ALIASES = {
+    '': {
+        'product_image': {'size': (285, 160), 'crop': True},
+    },
+}
 
 try:
     from .local_settings import *
