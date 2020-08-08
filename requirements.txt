@@ -14,3 +14,4 @@ Pillow==7.2.0
 easy-thumbnails==2.7
 boto==2.49.0
 django-storages==1.9.1
+boto3==1.14.38
