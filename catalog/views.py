@@ -2,7 +2,7 @@
 
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
-
+from django.views.decorators.cache import cache_page
 from watson import search as watson
 
 from .models import Product, Category
@@ -43,6 +43,7 @@ class CategoryListView(ListView):
 category = CategoryListView.as_view()
 
 
+@cache_page(60 * 10)
 def product(request, c_slug, p_slug):
 	# category = Category.objects.get(slug=c_slug)
 	product = Product.objects.get(slug=p_slug)
