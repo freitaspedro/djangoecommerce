@@ -10,7 +10,7 @@ whitenoise==5.1.0
 django-widget-tweaks==1.4.8
 pagseguro==0.3.4
 django-paypal==1.0.0
-Pillow==7.2.0
+Pillow==8.3.2
 easy-thumbnails==2.7
 boto==2.49.0
 django-storages==1.9.1
